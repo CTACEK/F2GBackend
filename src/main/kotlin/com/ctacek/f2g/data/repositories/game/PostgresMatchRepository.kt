@@ -9,12 +9,12 @@ import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 import com.ctacek.f2g.data.entities.*
 import com.ctacek.f2g.domain.entities.UserDTO
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.utils.UpdateModel
 
-class PostgresGameRepository(
+class PostgresMatchRepository(
     private val database: Database,
-) : GameRepository {
+) : MatchRepository {
 
     private val _updates = MutableSharedFlow<UpdateModel>()
     override val updates: Flow<UpdateModel>

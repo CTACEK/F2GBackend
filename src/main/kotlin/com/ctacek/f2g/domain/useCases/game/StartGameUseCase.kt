@@ -2,7 +2,7 @@ package com.ctacek.f2g.domain.useCases.game
 
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.utils.GiftDispenser
@@ -11,7 +11,7 @@ class StartGameUseCase : KoinComponent {
     private val giftDispenser: GiftDispenser by inject()
     private val usersRepository: UsersRepository by inject()
     private val roomsRepository: RoomsRepository by inject()
-    private val gameRepository: GameRepository by inject()
+    private val matchRepository: MatchRepository by inject()
 
     sealed interface Result {
         object Successful : Result
@@ -33,7 +33,7 @@ class StartGameUseCase : KoinComponent {
         if (room.ownerId != userId) return Result.Forbidden
         if (room.gameStarted) return Result.GameAlreadyStarted
 
-        val users = gameRepository.getUsersInRoom(roomId).toMutableList()
+        val users = matchRepository.getUsersInRoom(roomId).toMutableList()
 
         if (users.find { it.accepted == false } != null) return Result.ActiveRequests
 
@@ -46,9 +46,9 @@ class StartGameUseCase : KoinComponent {
         val resultRelations = giftDispenser.getRandomDistribution(users = users.map { it.userId })
 
         resultRelations.forEach {
-            if (!gameRepository.setRecipient(roomId, it.first, it.second)) return Result.Failed
+            if (!matchRepository.setRecipient(roomId, it.first, it.second)) return Result.Failed
         }
-        gameRepository.setGameState(roomId, true)
+        matchRepository.setGameState(roomId, true)
         return Result.Successful
     }
 }

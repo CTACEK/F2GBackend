@@ -69,12 +69,12 @@ GET /openapi
   
 ROOM_ID - идентификатор комнаты
 ```
-  ws://BASE_URL/api/v1/game?id=ROOM_ID
+  ws://BASE_URL/api/v1/match?id=ROOM_ID
 ```
 
 ---
 ### Подписка на обновления в списке комнат игрока
 
   ```
-    ws://BASE_URL/api/v1/game/all
+    ws://BASE_URL/api/v1/match/all
   ```

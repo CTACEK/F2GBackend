@@ -1,4 +1,4 @@
-package com.ctacek.f2g.api.v1.requests.game
+package com.ctacek.f2g.api.v1.requests.match
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

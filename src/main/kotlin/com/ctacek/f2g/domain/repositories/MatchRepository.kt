@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import com.ctacek.f2g.domain.entities.UserDTO
 import com.ctacek.f2g.utils.UpdateModel
 
-interface GameRepository {
+interface MatchRepository {
     val updates: Flow<UpdateModel>
     suspend fun addToRoom(roomId: String, userId: String, wishlist: String?): Boolean
     suspend fun deleteFromRoom(roomId: String, userId: String): Boolean

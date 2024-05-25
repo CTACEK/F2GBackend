@@ -7,23 +7,23 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.ctacek.f2g.api.v1.requests.game.AcceptUserRequest
-import com.ctacek.f2g.api.v1.requests.game.JoinRoomRequest
-import com.ctacek.f2g.api.v1.requests.game.KickUserRequest
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.api.v1.requests.match.AcceptUserRequest
+import com.ctacek.f2g.api.v1.requests.match.JoinRoomRequest
+import com.ctacek.f2g.api.v1.requests.match.KickUserRequest
+import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.domain.useCases.UseCases
 import com.ctacek.f2g.domain.useCases.game.*
 
-fun Route.configureGameRoutes(
+fun Route.configureMatchRoutes(
     useCases: UseCases,
     usersRepository: UsersRepository,
     roomsRepository: RoomsRepository,
-    gameRepository: GameRepository,
+    matchRepository: MatchRepository,
 ) {
-    route("/game") {
-        webSockets(usersRepository, roomsRepository, gameRepository)
+    route("/match") {
+        webSockets(usersRepository, roomsRepository, matchRepository)
 
         authenticate {
             post("/join") {

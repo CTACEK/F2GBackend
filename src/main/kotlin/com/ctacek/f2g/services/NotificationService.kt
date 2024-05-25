@@ -5,7 +5,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.ctacek.f2g.domain.entities.Notification
 import com.ctacek.f2g.domain.entities.NotificationMessage
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.domain.services.OneSignalService
@@ -14,7 +14,7 @@ import com.ctacek.f2g.utils.UpdateModel
 class NotificationService : KoinComponent {
     private val usersRepository: UsersRepository by inject()
     private val roomsRepository: RoomsRepository by inject()
-    private val gameRepository: GameRepository by inject()
+    private val matchRepository: MatchRepository by inject()
 
     private val oneSignalService: OneSignalService by inject()
 
@@ -34,7 +34,7 @@ class NotificationService : KoinComponent {
             }
 
             val gameUpdates = async {
-                gameRepository.updates.collect {
+                matchRepository.updates.collect {
                     val message = when (it) {
                         is UpdateModel.GameStateUpdate -> NotificationMessage(
                             en = "Game state updated!",
@@ -69,7 +69,7 @@ class NotificationService : KoinComponent {
             if (forOwner) {
                 usersRepository.getUserByID(room.ownerId)?.clientIds ?: emptyList()
             } else {
-                gameRepository
+                matchRepository
                     .getUsersInRoom(roomId)
                     .map { user ->
                         usersRepository.getUserByID(user.userId)

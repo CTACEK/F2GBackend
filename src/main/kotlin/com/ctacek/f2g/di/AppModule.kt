@@ -10,10 +10,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import org.ktorm.database.Database
-import com.ctacek.f2g.data.repositories.game.PostgresGameRepository
+import com.ctacek.f2g.data.repositories.game.PostgresMatchRepository
 import com.ctacek.f2g.data.repositories.rooms.PostgresRoomsRepository
 import com.ctacek.f2g.data.repositories.users.PostgresUsersRepository
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.domain.services.OneSignalService
@@ -56,7 +56,7 @@ val appModule = module {
 
     single<UsersRepository> { PostgresUsersRepository(get()) }
     single<RoomsRepository> { PostgresRoomsRepository(get()) }
-    single<GameRepository> { PostgresGameRepository(get()) }
+    single<MatchRepository> { PostgresMatchRepository(get()) }
 
     single {
         TokenConfig(

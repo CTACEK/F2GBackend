@@ -10,7 +10,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.utils.UpdateModel
@@ -24,7 +24,7 @@ private val json = Json {
 fun Route.webSockets(
     usersRepository: UsersRepository,
     roomsRepository: RoomsRepository,
-    gameRepository: GameRepository,
+    matchRepository: MatchRepository,
 ) {
     authenticate {
         webSocket {
@@ -44,7 +44,7 @@ fun Route.webSockets(
                 return@webSocket
             }
 
-            if (!gameRepository.checkUserInRoom(roomId = roomId, userId = userId)) {
+            if (!matchRepository.checkUserInRoom(roomId = roomId, userId = userId)) {
                 send(Frame.Text("User not in the room"))
                 close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "User not in the room"))
                 return@webSocket
@@ -60,7 +60,7 @@ fun Route.webSockets(
             }
 
             val gameUpdateHandler = async {
-                gameRepository.updates
+                matchRepository.updates
                     .collect { update ->
                         if (update is UpdateModel.GameStateUpdate && update.roomId != roomId) return@collect
                         if (update is UpdateModel.UsersUpdate && update.roomId != roomId) return@collect
@@ -95,7 +95,7 @@ fun Route.webSockets(
             }
 
             val gameUpdateHandler = async {
-                gameRepository.updates
+                matchRepository.updates
                     .collect { update ->
                         if (update is UpdateModel.GameStateUpdate && userRooms.find { it.id == update.roomId } == null) return@collect
                         if (update is UpdateModel.UsersUpdate && userRooms.find { it.id == update.roomId } == null) return@collect
