@@ -24,7 +24,7 @@ jobs:
           CR_REPOSITORY: backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
           docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
         
 
@@ -49,4 +49,5 @@ jobs:
           if [ "$(docker ps -a -q)" ]; then
             sudo docker rm $(docker ps -a -q) &> /dev/null
           fi
-          sudo docker-compose up --no-cache -d
+          sudo docker-compose pull
+          sudo docker-compose up -d --force-recreate
