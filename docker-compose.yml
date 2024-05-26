@@ -18,11 +18,11 @@ services:
       - JWT_REFRESH_LIFETIME=$JWT_REFRESH_LIFETIME
       - ONESIGNAL_API_KEY=$ONESIGNAL_API_KEY
       - ONESIGNAL_APP_ID=$ONESIGNAL_APP_ID
+      - KINOPOISK_API_TOKEN=$KINOPOISK_API_TOKEN
     depends_on:
       - db
     networks:
       - db_network
-      - prometheus_network
     restart: always
 
   db:
@@ -30,7 +30,7 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
     environment:
-      POSTGRES_DB: "santa"
+      POSTGRES_DB: "f2g"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
@@ -40,30 +40,6 @@ services:
       - db_network
     restart: always
 
-  # Prometheus container to query backend metrics
-  prometheus:
-    image: prom/prometheus
-    restart: always
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring:/etc/prometheus/
-    networks:
-      - prometheus_network
-
-      # Grafana container to visualize data
-  grafana:
-    image: grafana/grafana:5.1.0
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./monitoring/grafana:/var/lib/grafana
-    networks:
-      - prometheus_network
-    user: "0"
-
 networks:
   db_network:
-    driver: bridge
-  prometheus_network:
     driver: bridge

@@ -1,10 +1,5 @@
 package com.ctacek.f2g.data.repositories.rooms
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import org.ktorm.database.Database
-import org.ktorm.dsl.*
-import org.ktorm.entity.*
 import com.ctacek.f2g.data.entities.RoomMembers
 import com.ctacek.f2g.data.entities.Rooms
 import com.ctacek.f2g.data.mappers.mapToRoom
@@ -13,6 +8,11 @@ import com.ctacek.f2g.domain.entities.RoomDTO.Room
 import com.ctacek.f2g.domain.entities.RoomDTO.RoomInfo
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.utils.UpdateModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import org.ktorm.database.Database
+import org.ktorm.dsl.*
+import org.ktorm.entity.*
 
 class PostgresRoomsRepository(
     private val database: Database,
@@ -27,9 +27,7 @@ class PostgresRoomsRepository(
             id = room.id
             name = room.name
             date = room.date
-            maxPrice = room.maxPrice
             ownerId = room.ownerId
-            playableOwner = room.playableOwner
             gameStarted = false
         }
         var affectedRows = database.sequenceOf(Rooms).add(newRoomEntity)
@@ -58,7 +56,6 @@ class PostgresRoomsRepository(
         val room = database.sequenceOf(Rooms).find { it.id eq id } ?: return false
         room.name = newRoomData.name ?: room.name
         room.date = newRoomData.date ?: room.date
-        room.maxPrice = newRoomData.maxPrice ?: room.maxPrice
         val affectedRows = room.flushChanges()
         return if (affectedRows == 1) {
             _updates.emit(UpdateModel.RoomUpdate(id, newRoomData))
@@ -78,22 +75,20 @@ class PostgresRoomsRepository(
                 Rooms.ownerId,
                 Rooms.gameStarted,
                 RoomMembers.accepted,
-                Rooms.playableOwner,
             ).where {
                 RoomMembers.userId eq userId
             }.map { room ->
                 val membersCount = database.sequenceOf(RoomMembers).filter { it.roomId eq (room[Rooms.id] ?: "") }
                     .aggregateColumns { count(it.userId) }
                 RoomInfo(
-                    name = room[Rooms.name] ?: "",
                     id = room[Rooms.id] ?: "",
+                    shortName = room[Rooms.shortName] ?: "",
+                    name = room[Rooms.name] ?: "",
                     date = room[Rooms.date],
                     ownerId = room[Rooms.ownerId] ?: "",
-                    maxPrice = room[Rooms.maxPrice],
                     gameStarted = room[Rooms.gameStarted] ?: false,
                     membersCount = membersCount ?: 0,
                     accepted = room[RoomMembers.accepted]!!,
-                    playableOwner = room[Rooms.playableOwner]!!,
                 )
             }
 }

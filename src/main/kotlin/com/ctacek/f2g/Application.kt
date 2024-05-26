@@ -2,13 +2,16 @@ package com.ctacek.f2g
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.ctacek.f2g.api.v1.routing.v1Routes
+import com.ctacek.f2g.di.appModule
+import com.ctacek.f2g.security.jwt.token.TokenConfig
+import com.ctacek.f2g.services.NotificationService
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
-import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -19,25 +22,12 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
-import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics
-import io.micrometer.core.instrument.binder.system.ProcessorMetrics
-import io.micrometer.core.instrument.binder.system.UptimeMetrics
-import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 import org.slf4j.event.Level
-import com.ctacek.f2g.api.v1.routing.v1Routes
-import com.ctacek.f2g.di.appModule
-import com.ctacek.f2g.security.jwt.token.TokenConfig
-import com.ctacek.f2g.services.NotificationService
 import java.io.File
 import java.time.Duration
 
@@ -54,7 +44,6 @@ fun Application.module() {
     configureSerialization()
     configureWebSockets()
     configureRouting()
-    configureMicrometrics()
     configureNotificationService()
 }
 
@@ -91,22 +80,6 @@ private fun Application.configureRouting() {
         route("/api") {
             v1Routes()
         }
-        metrics()
-    }
-}
-
-private fun Application.configureMicrometrics() {
-    install(MicrometerMetrics) {
-        registry = this@configureMicrometrics.get<PrometheusMeterRegistry>()
-        meterBinders = listOf(
-            ClassLoaderMetrics(),
-            JvmMemoryMetrics(),
-            JvmGcMetrics(),
-            ProcessorMetrics(),
-            JvmThreadMetrics(),
-            FileDescriptorMetrics(),
-            UptimeMetrics(),
-        )
     }
 }
 
@@ -160,14 +133,5 @@ private fun Application.configureSerialization() {
                 explicitNulls = false
             },
         )
-    }
-}
-
-private fun Routing.metrics() {
-    val registry = get<PrometheusMeterRegistry>()
-    get("/metrics") {
-        call.respondText {
-            registry.scrape()
-        }
     }
 }

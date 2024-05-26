@@ -1,5 +1,9 @@
 package com.ctacek.f2g.api.v1.routing
 
+import com.ctacek.f2g.domain.repositories.MatchRepository
+import com.ctacek.f2g.domain.repositories.RoomsRepository
+import com.ctacek.f2g.domain.repositories.UsersRepository
+import com.ctacek.f2g.utils.UpdateModel
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.routing.*
@@ -10,10 +14,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import com.ctacek.f2g.domain.repositories.MatchRepository
-import com.ctacek.f2g.domain.repositories.RoomsRepository
-import com.ctacek.f2g.domain.repositories.UsersRepository
-import com.ctacek.f2g.utils.UpdateModel
 
 @OptIn(ExperimentalSerializationApi::class)
 private val json = Json {
@@ -70,6 +70,36 @@ fun Route.webSockets(
             awaitAll(roomUpdateHandler, gameUpdateHandler)
         }
     }
+
+//    authenticate {
+//        webSocket("/match") {
+//            val userId = call.principal<JWTPrincipal>()?.payload?.getClaim("userId")?.asString() ?: run {
+//                send(Frame.Text("No access token provided"))
+//                close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "No access token provided"))
+//                return@webSocket
+//            }
+//
+//            val userMovies = MoviesRepository.getRandomMovies(5)
+//            send(Frame.Text(Json.encodeToString(userMovies)))
+//
+//            for (frame in incoming) {
+//                frame as? Frame.Text ?: continue
+//                val userLikes = Json.decodeFromString<List<Boolean>>(frame.readText())
+//                userLikes.forEachIndexed { index, like ->
+//                    UserLikesRepository.addLike(UserLike(userId, userMovies[index].id, like))
+//                }
+//
+//                // Проверка мэтчей
+//                userMovies.forEach { movie ->
+//                    val likes = UserLikesRepository.getLikesForMovie(movie.id)
+//                    if (likes.count { it.like } > 1) {  // Простая логика мэтчинга, если более одного лайка
+//                        val matchedUsers = likes.map { it.userId }.distinct()
+//                        send(Frame.Text("Match found for movie ${movie.title} with users $matchedUsers"))
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     authenticate {
         webSocket("/all") { // subscribe on all user's rooms updates
