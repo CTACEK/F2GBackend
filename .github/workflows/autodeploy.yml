@@ -43,30 +43,27 @@ jobs:
           username: ctaceks
           key: ${{ secrets.KEY }}
           port: 22
-
-      - name: Run commands on VM
-        env:
-           YANDEX_KEY: ${{ secrets.YANDEX_KEY }}
-           IMAGE_TAG: ${{ github.sha }}
-           SERVER_PORT: ${{ secrets.SERVER_PORT }}
-           DATABASE_CONNECTION_STRING: ${{ secrets.DATABASE_CONNECTION_STRING }}
-           POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-           JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
-           JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
-           JWT_ACCESS_LIFETIME: ${{ secrets.JWT_ACCESS_LIFETIME }}
-           JWT_REFRESH_LIFETIME: ${{ secrets.JWT_REFRESH_LIFETIME }}
-           ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
-           ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
-           KINOPOISK_API_TOKEN: ${{ secrets.KINOPOISK_API_TOKEN }}
-        run: |
-          sudo docker login --username oauth --password $YANDEX_KEY cr.yandex
-          if [ "$(docker ps -q)" ]; then
-            sudo docker kill $(docker ps -q) &> /dev/null
-          fi
-          if [ "$(docker ps -a -q)" ]; then
-            sudo docker rm $(docker ps -a -q) &> /dev/null
-          fi
-          sudo docker-compose pull
-          sudo docker-compose up -d --force-recreate
+          script: |
+            export YANDEX_KEY=${{ secrets.YANDEX_KEY }}
+            export IMAGE_TAG=${{ github.sha }}
+            export SERVER_PORT=${{ secrets.SERVER_PORT }}
+            export DATABASE_CONNECTION_STRING=${{ secrets.DATABASE_CONNECTION_STRING }}
+            export POSTGRES_NAME=${{ secrets.POSTGRES_NAME }}
+            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export JWT_AUDIENCE=${{ secrets.JWT_AUDIENCE }}
+            export JWT_ISSUER=${{ secrets.JWT_ISSUER }}
+            export JWT_ACCESS_LIFETIME=${{ secrets.JWT_ACCESS_LIFETIME }}
+            export JWT_REFRESH_LIFETIME=${{ secrets.JWT_REFRESH_LIFETIME }}
+            export ONESIGNAL_API_KEY=${{ secrets.ONESIGNAL_API_KEY }}
+            export ONESIGNAL_APP_ID=${{ secrets.ONESIGNAL_APP_ID }}
+            export KINOPOISK_API_TOKEN=${{ secrets.KINOPOISK_API_TOKEN }}
+            sudo docker login --username oauth --password $YANDEX_KEY cr.yandex
+            if [ "$(docker ps -q)" ]; then
+              sudo docker kill $(docker ps -q) &> /dev/null
+            fi
+            if [ "$(docker ps -a -q)" ]; then
+              sudo docker rm $(docker ps -a -q) &> /dev/null
+            fi
+            sudo docker-compose pull
+            sudo docker-compose up -d --force-recreate
