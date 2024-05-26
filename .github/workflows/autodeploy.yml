@@ -20,7 +20,7 @@ jobs:
 
       - name: Build image (Yandex Cloud)
         env:
-          CR_REGISTRY: c
+          CR_REGISTRY: crpr9q2g3bdv573r6nng
           CR_REPOSITORY: backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -49,4 +49,6 @@ jobs:
           if [ "$(docker ps -a -q)" ]; then
             sudo docker rm $(docker ps -a -q) &> /dev/null
           fi
-          sudo docker-compose up --no-cache -d
+          sudo docker-compose pull
+          sudo docker-compose up -d --force-recreate
+
