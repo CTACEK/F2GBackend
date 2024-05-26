@@ -14,6 +14,8 @@ data class InfoDetails(
     val roomName: String,
     @SerialName("owner_id")
     val ownerId: String,
-    val date: @Serializable(with = LocalDateSerializer::class) LocalDate?,
+    val date:
+    @Serializable(with = LocalDateSerializer::class)
+    LocalDate?,
     val users: List<UserDTO.UserRoomInfo>,
 )
