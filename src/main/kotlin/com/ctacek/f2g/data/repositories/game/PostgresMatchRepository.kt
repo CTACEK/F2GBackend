@@ -67,7 +67,9 @@ class PostgresMatchRepository(
     override suspend fun setGameState(roomId: String, state: Boolean): Boolean {
         val affectedRows = database.update(Rooms) {
             set(it.gameStarted, state)
-            where { it.id eq roomId }
+            where {
+                it.id eq roomId
+            }
         }
         return if (affectedRows == 1) {
             _updates.emit(UpdateModel.GameStateUpdate(roomId, state))
