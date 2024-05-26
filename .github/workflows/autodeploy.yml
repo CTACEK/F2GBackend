@@ -20,12 +20,12 @@ jobs:
 
       - name: Build image (Yandex Cloud)
         env:
-          CR_REGISTRY: crpr9q2g3bdv573r6nng
+          CR_REGISTRY: c
           CR_REPOSITORY: backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:user$IMAGE_TAG
-          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:user$IMAGE_TAG
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
         
 
       - name: Connect to VM via SSH
@@ -49,4 +49,4 @@ jobs:
           if [ "$(docker ps -a -q)" ]; then
             sudo docker rm $(docker ps -a -q) &> /dev/null
           fi
-          sudo docker run -dp 80:1111 cr.yandex/crp7qfv6r081t2ofp03o/backend:user${{ github.sha }} && sudo docker run -dp 81:2222 cr.yandex/crp7qfv6r081t2ofp03o/backend:market${{ github.sha }}
+          sudo docker-compose up --no-cache --build -d cr.yandex/crpr9q2g3bdv573r6nng/backend:${{ github.sha }}
