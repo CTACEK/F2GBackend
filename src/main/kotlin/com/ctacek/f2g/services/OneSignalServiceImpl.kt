@@ -1,13 +1,13 @@
 package com.ctacek.f2g.services
 
+import com.ctacek.f2g.domain.entities.Notification
+import com.ctacek.f2g.domain.services.OneSignalService
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import com.ctacek.f2g.domain.entities.Notification
-import com.ctacek.f2g.domain.services.OneSignalService
 
 class OneSignalServiceImpl(
     private val client: HttpClient,

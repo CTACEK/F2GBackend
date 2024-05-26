@@ -1,15 +1,15 @@
 package com.ctacek.f2g.domain.useCases.game
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class StopGameUseCase : KoinComponent {
     private val usersRepository: UsersRepository by inject()
     private val roomsRepository: RoomsRepository by inject()
-    private val gameRepository: GameRepository by inject()
+    private val matchRepository: MatchRepository by inject()
 
     sealed interface Result {
         object Successful : Result
@@ -28,7 +28,7 @@ class StopGameUseCase : KoinComponent {
         val room = roomsRepository.getRoomById(roomId) ?: return Result.RoomNotFound
         if (room.ownerId != userId) return Result.Forbidden
         if (!room.gameStarted) return Result.GameAlreadyStopped
-        val res = gameRepository.setGameState(roomId, false) && gameRepository.deleteRecipients(roomId)
+        val res = matchRepository.setGameState(roomId, false)
         return if (res) Result.Successful else Result.Failed
     }
 }

@@ -74,7 +74,6 @@ dependencies {
     implementation("io.ktor:ktor-metrics:1.6.8")
     implementation("io.ktor:ktor-metrics-micrometer:1.6.8")
     implementation("io.ktor:ktor-server-metrics-micrometer-jvm:2.2.2")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.10.3")
 
     // HTTP client
     implementation("io.ktor:ktor-client-core:$ktorVersion")

@@ -1,19 +1,11 @@
 package com.ctacek.f2g.di
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
-import io.micrometer.prometheus.PrometheusConfig
-import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import org.koin.dsl.module
-import org.ktorm.database.Database
-import com.ctacek.f2g.data.repositories.game.PostgresGameRepository
+import com.ctacek.f2g.data.repositories.game.PostgresMatchRepository
+import com.ctacek.f2g.data.repositories.movie.RemoteMovieRepository
 import com.ctacek.f2g.data.repositories.rooms.PostgresRoomsRepository
 import com.ctacek.f2g.data.repositories.users.PostgresUsersRepository
-import com.ctacek.f2g.domain.repositories.GameRepository
+import com.ctacek.f2g.domain.repositories.MatchRepository
+import com.ctacek.f2g.domain.repositories.MovieRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.domain.services.OneSignalService
@@ -24,8 +16,14 @@ import com.ctacek.f2g.security.jwt.token.JwtTokenService
 import com.ctacek.f2g.security.jwt.token.TokenConfig
 import com.ctacek.f2g.security.jwt.token.TokenService
 import com.ctacek.f2g.services.OneSignalServiceImpl
-import com.ctacek.f2g.utils.GiftDispenser
-import com.ctacek.f2g.utils.SimpleCycleGiftDispenser
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import org.koin.dsl.module
+import org.ktorm.database.Database
 
 @OptIn(ExperimentalSerializationApi::class)
 val appModule = module {
@@ -56,7 +54,13 @@ val appModule = module {
 
     single<UsersRepository> { PostgresUsersRepository(get()) }
     single<RoomsRepository> { PostgresRoomsRepository(get()) }
-    single<GameRepository> { PostgresGameRepository(get()) }
+    single<MatchRepository> { PostgresMatchRepository(get()) }
+    single<MovieRepository> {
+        RemoteMovieRepository(
+            client = get(),
+            kinopoiskApiToken = System.getenv("KINOPOISK_API_TOKEN"),
+        )
+    }
 
     single {
         TokenConfig(
@@ -72,9 +76,5 @@ val appModule = module {
 
     single<HashingService> { BcryptHashingService() }
 
-    single<GiftDispenser> { SimpleCycleGiftDispenser() }
-
     single { UseCases() }
-
-    single { PrometheusMeterRegistry(PrometheusConfig.DEFAULT) }
 }

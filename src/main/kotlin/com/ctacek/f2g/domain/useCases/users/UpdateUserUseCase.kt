@@ -1,9 +1,9 @@
 package com.ctacek.f2g.domain.useCases.users
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.ctacek.f2g.domain.entities.UserDTO
 import com.ctacek.f2g.domain.repositories.UsersRepository
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class UpdateUserUseCase : KoinComponent {
     private val usersRepository: UsersRepository by inject()

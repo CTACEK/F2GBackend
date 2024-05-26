@@ -9,11 +9,9 @@ values ('images/avatar1.jpg');
 create table users
 (
     user_id       text primary key,
-    name          text,
-    email         text not null,
+    username      text not null,
     password_hash text,
     auth_provider text not null default 'local',
-    address       text,
     avatar        int references avatars (id)
 );
 
@@ -30,10 +28,9 @@ create table rooms
 (
     id             text primary key,
     name           text                                              not null,
+    short_name     text                                              not null,
     owner_id       text references users (user_id) on delete cascade not null,
-    playable_owner boolean default false,
     date           date,
-    max_price      integer check ( max_price > 0 ),
     game_started   boolean default false
 );
 
@@ -41,7 +38,4 @@ create table room_members
 (
     room_id   text references rooms (id) on delete cascade not null,
     user_id   text references users (user_id)              not null,
-    recipient text references users (user_id),
-    wishlist  text,
-    accepted  boolean default false
 );

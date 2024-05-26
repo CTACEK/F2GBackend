@@ -1,5 +1,18 @@
 package com.ctacek.f2g.api.v1.routing
 
+import com.ctacek.f2g.api.v1.requests.users.UpdateUserRequest
+import com.ctacek.f2g.api.v1.requests.users.auth.LoginViaUsernameRequest
+import com.ctacek.f2g.api.v1.requests.users.auth.RefreshTokenRequest
+import com.ctacek.f2g.api.v1.requests.users.auth.SignUpViaUsernameRequest
+import com.ctacek.f2g.domain.entities.UserDTO
+import com.ctacek.f2g.domain.useCases.UseCases
+import com.ctacek.f2g.domain.useCases.rooms.GetUserRoomsUseCase
+import com.ctacek.f2g.domain.useCases.users.DeleteUserUseCase
+import com.ctacek.f2g.domain.useCases.users.GetUserDetailsUseCase
+import com.ctacek.f2g.domain.useCases.users.UpdateUserUseCase
+import com.ctacek.f2g.domain.useCases.users.auth.LoginViaUsernameUseCase
+import com.ctacek.f2g.domain.useCases.users.auth.RefreshTokenUseCase
+import com.ctacek.f2g.domain.useCases.users.auth.SignUpViaUsernameUseCase
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -7,19 +20,6 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.ctacek.f2g.api.v1.requests.users.UpdateUserRequest
-import com.ctacek.f2g.api.v1.requests.users.auth.LoginViaEmailRequest
-import com.ctacek.f2g.api.v1.requests.users.auth.RefreshTokenRequest
-import com.ctacek.f2g.api.v1.requests.users.auth.SignUpViaEmailRequest
-import com.ctacek.f2g.domain.entities.UserDTO
-import com.ctacek.f2g.domain.useCases.UseCases
-import com.ctacek.f2g.domain.useCases.rooms.GetUserRoomsUseCase
-import com.ctacek.f2g.domain.useCases.users.DeleteUserUseCase
-import com.ctacek.f2g.domain.useCases.users.GetUserDetailsUseCase
-import com.ctacek.f2g.domain.useCases.users.UpdateUserUseCase
-import com.ctacek.f2g.domain.useCases.users.auth.LoginViaEmailUseCase
-import com.ctacek.f2g.domain.useCases.users.auth.RefreshTokenUseCase
-import com.ctacek.f2g.domain.useCases.users.auth.SignUpViaEmailUseCase
 
 fun Route.configureUserRoutes(
     useCases: UseCases,
@@ -113,15 +113,10 @@ fun Route.configureUserRoutes(
                 val userUpdate = call.receiveNullable<UpdateUserRequest>()?.let {
                     UserDTO.UpdateUser(
                         username = it.username,
-                        address = it.address,
                         avatar = it.avatar,
                     )
                 } ?: run {
                     call.respond(HttpStatusCode.BadRequest)
-                    return@patch
-                }
-                if (userUpdate.username == null && userUpdate.address == null && userUpdate.avatar == null) {
-                    call.respond(HttpStatusCode.BadRequest, "No data provided")
                     return@patch
                 }
 
@@ -153,19 +148,17 @@ fun Route.configureUserRoutes(
 
 private fun Route.configureAuthRoutes(useCases: UseCases) {
     route("/auth") {
-        post("/email/register") { // Register user
+        post("/username/register") { // Register user
             val clientId = call.request.headers["client-id"] ?: run {
                 call.respond(HttpStatusCode.BadRequest, "No client id provided")
                 return@post
             }
 
-            val registerRequest = call.receiveNullable<SignUpViaEmailRequest>()?.let {
-                UserDTO.UserEmailSignUp(
+            val registerRequest = call.receiveNullable<SignUpViaUsernameRequest>()?.let {
+                UserDTO.UserSignUp(
                     username = it.username,
                     password = it.password,
-                    email = it.email,
                     clientId = clientId,
-                    address = it.address,
                     avatar = it.avatar,
                 )
             } ?: run {
@@ -173,58 +166,58 @@ private fun Route.configureAuthRoutes(useCases: UseCases) {
                 return@post
             }
 
-            when (val res = useCases.signUpViaEmailUseCase(registerRequest)) {
-                SignUpViaEmailUseCase.Result.Failed -> {
+            when (val res = useCases.signUpViaUsernameUseCase(registerRequest)) {
+                SignUpViaUsernameUseCase.Result.Failed -> {
                     call.respond(HttpStatusCode.InternalServerError)
                     return@post
                 }
 
-                is SignUpViaEmailUseCase.Result.Successful -> {
+                is SignUpViaUsernameUseCase.Result.Successful -> {
                     call.respond(HttpStatusCode.OK, res.tokenPair)
                     return@post
                 }
 
-                SignUpViaEmailUseCase.Result.UserAlreadyExists -> {
+                SignUpViaUsernameUseCase.Result.UserAlreadyExists -> {
                     call.respond(HttpStatusCode.Conflict, "User already exists")
                     return@post
                 }
 
-                SignUpViaEmailUseCase.Result.AvatarNotFound -> {
+                SignUpViaUsernameUseCase.Result.AvatarNotFound -> {
                     call.respond(HttpStatusCode.BadRequest)
                     return@post
                 }
             }
         }
 
-        post("/email/login") {
+        post("/username/login") {
             val clientId = call.request.headers["client-id"] ?: run {
                 call.respond(HttpStatusCode.BadRequest, "No client id provided")
                 return@post
             }
-            val (email, password) = call.receiveNullable<LoginViaEmailRequest>() ?: run {
+            val (username, password) = call.receiveNullable<LoginViaUsernameRequest>() ?: run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
 
             when (
-                val res = useCases.loginViaEmailUseCase(
-                    email = email,
+                val res = useCases.loginViaUsernameUseCase(
+                    username = username,
                     password = password,
                     clientId = clientId,
                 )
             ) {
-                LoginViaEmailUseCase.Result.Failed -> {
+                LoginViaUsernameUseCase.Result.Failed -> {
                     call.respond(HttpStatusCode.InternalServerError)
                     return@post
                 }
 
-                is LoginViaEmailUseCase.Result.Success -> {
+                is LoginViaUsernameUseCase.Result.Success -> {
                     call.respond(HttpStatusCode.OK, res.tokenPair)
                     return@post
                 }
 
-                LoginViaEmailUseCase.Result.Forbidden -> {
-                    call.respond(HttpStatusCode.Forbidden, "Wrong password or email")
+                LoginViaUsernameUseCase.Result.Forbidden -> {
+                    call.respond(HttpStatusCode.Forbidden, "Wrong password or username")
                     return@post
                 }
             }
