@@ -22,7 +22,6 @@ services:
     depends_on:
       - db
     networks:
-      - reverse-proxy
       - db_network
     restart: always
 
@@ -42,8 +41,5 @@ services:
     restart: always
 
 networks:
-  reverse-proxy:
-    external:
-      name: reverse-proxy
   db_network:
     driver: bridge
