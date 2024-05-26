@@ -11,6 +11,6 @@ data class CreateRoomRequest(
     val username: String,
     val password: String?,
     val date:
-    @Serializable(with = LocalDateSerializer::class)
-    LocalDate?,
+        @Serializable(with = LocalDateSerializer::class)
+        LocalDate?,
 )
