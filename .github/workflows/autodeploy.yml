@@ -18,6 +18,15 @@ jobs:
         with:
           yc-sa-json-credentials: ${{ secrets.AUTHORIZED_KEY }}
 
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
       - name: Build image (Yandex Cloud)
         env:
           CR_REGISTRY: crpr9q2g3bdv573r6nng
