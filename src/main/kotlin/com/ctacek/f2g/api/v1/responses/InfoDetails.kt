@@ -8,9 +8,12 @@ import java.time.LocalDate
 
 @Serializable
 data class InfoDetails(
-    @SerialName("room_id") val roomId: String,
-    @SerialName("room_name") val roomName: String,
-    @SerialName("owner_id") val ownerId: String,
+    @SerialName("room_id")
+    val roomId: String,
+    @SerialName("room_name")
+    val roomName: String,
+    @SerialName("owner_id")
+    val ownerId: String,
     val date: @Serializable(with = LocalDateSerializer::class) LocalDate?,
     val users: List<UserDTO.UserRoomInfo>,
 )
