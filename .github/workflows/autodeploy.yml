@@ -20,7 +20,7 @@ jobs:
 
       - name: Build image (Yandex Cloud)
         env:
-          CR_REGISTRY: c
+          CR_REGISTRY: crpr9q2g3bdv573r6nng
           CR_REPOSITORY: backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
