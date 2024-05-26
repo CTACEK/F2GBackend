@@ -49,4 +49,4 @@ jobs:
           if [ "$(docker ps -a -q)" ]; then
             sudo docker rm $(docker ps -a -q) &> /dev/null
           fi
-          sudo docker-compose up --no-cache -d cr.yandex/crpr9q2g3bdv573r6nng/backend:${{ github.sha }}
+          sudo docker-compose up --no-cache -d
