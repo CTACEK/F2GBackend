@@ -1,9 +1,9 @@
-version: "4"
+version: "3.8"
 services:
   server:
     build: .
     ports:
-      - "127.0.0.1:${SERVER_PORT}:${SERVER_PORT}"
+      - "8081:${SERVER_PORT}"
     volumes:
       - ./files:/files
     environment:
