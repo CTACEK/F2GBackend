@@ -10,15 +10,11 @@ interface RoomMember : Entity<RoomMember> {
 
     var roomEntityId: RoomEntity
     var userId: User
-    var recipient: User?
-    var wishlist: String?
     var accepted: Boolean
 }
 
 object RoomMembers : Table<RoomMember>("room_members") {
     var roomId = text("room_id").references(Rooms) { it.roomEntityId }
     var userId = text("user_id").references(Users) { it.userId }
-    var recipient = text("recipient").references(Users) { it.recipient }
-    var wishlist = text("wishlist").bindTo(RoomMember::wishlist)
     var accepted = boolean("accepted").bindTo(RoomMember::accepted)
 }

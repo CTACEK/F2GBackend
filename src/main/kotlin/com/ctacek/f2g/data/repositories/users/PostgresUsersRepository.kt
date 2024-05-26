@@ -1,10 +1,5 @@
 package com.ctacek.f2g.data.repositories.users
 
-import org.ktorm.database.Database
-import org.ktorm.dsl.*
-import org.ktorm.entity.add
-import org.ktorm.entity.find
-import org.ktorm.entity.sequenceOf
 import com.ctacek.f2g.data.entities.Avatars
 import com.ctacek.f2g.data.entities.RefreshTokens
 import com.ctacek.f2g.data.entities.User
@@ -16,6 +11,11 @@ import com.ctacek.f2g.domain.entities.AvatarDTO
 import com.ctacek.f2g.domain.entities.UserDTO
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.security.jwt.token.RefreshToken
+import org.ktorm.database.Database
+import org.ktorm.dsl.*
+import org.ktorm.entity.add
+import org.ktorm.entity.find
+import org.ktorm.entity.sequenceOf
 
 class PostgresUsersRepository(
     private val database: Database,
@@ -25,11 +25,9 @@ class PostgresUsersRepository(
         val affectedRows = database.sequenceOf(Users).add(
             User {
                 userId = user.userId
-                name = user.username
-                email = user.email
+                username = user.username
                 passwordHash = user.passwordHash
                 authProvider = user.authProvider
-                address = user.address
                 this.avatar = avatar
             },
         )
@@ -46,18 +44,14 @@ class PostgresUsersRepository(
             .innerJoin(Avatars, on = Users.avatar eq Avatars.id)
             .select(
                 Users.userId,
-                Users.name,
-                Users.email,
-                Users.address,
+                Users.username,
                 Users.authProvider,
                 Avatars.image,
             )
             .where(Users.userId eq userId).limit(1).map { row ->
                 UserDTO.UserInfo(
                     userId = row[Users.userId]!!,
-                    username = row[Users.name]!!,
-                    email = row[Users.email]!!,
-                    address = row[Users.address],
+                    username = row[Users.username]!!,
                     avatar = row[Avatars.image]!!,
                     clientIds = clientIds,
                 )
@@ -72,21 +66,18 @@ class PostgresUsersRepository(
     override suspend fun updateUserByID(userId: String, update: UserDTO.UpdateUser): Boolean {
         val foundUser = database.sequenceOf(Users).find { it.userId eq userId } ?: return false
 
-        if (update.username != null) foundUser.name = update.username
-
-        foundUser.address = update.address
+        foundUser.username = update.username
 
         if (update.avatar != null) {
             val foundAvatar = database.sequenceOf(Avatars).find { it.id eq update.avatar } ?: return false
             foundUser.avatar = foundAvatar
         }
-//        if (update.email != null) foundUser.email = update.email
         val affectedRows = foundUser.flushChanges()
         return affectedRows == 1
     }
 
-    override suspend fun getUserByEmail(email: String): UserDTO.User? {
-        val foundUser = database.sequenceOf(Users).find { it.email eq email } ?: return null
+    override suspend fun getUserByUsername(username: String): UserDTO.User? {
+        val foundUser = database.sequenceOf(Users).find { it.username eq username } ?: return null
         return foundUser.mapToUser()
     }
 

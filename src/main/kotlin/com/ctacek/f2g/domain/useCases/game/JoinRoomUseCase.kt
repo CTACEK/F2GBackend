@@ -1,10 +1,10 @@
 package com.ctacek.f2g.domain.useCases.game
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.ctacek.f2g.domain.repositories.MatchRepository
 import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class JoinRoomUseCase : KoinComponent {
     private val usersRepository: UsersRepository by inject()
@@ -23,14 +23,13 @@ class JoinRoomUseCase : KoinComponent {
     suspend operator fun invoke(
         userId: String,
         roomId: String,
-        wishlist: String?,
     ): Result {
         if (usersRepository.getUserByID(userId) == null) return Result.UserNotFound
         val room = roomsRepository.getRoomById(roomId) ?: return Result.RoomNotFound
         if (matchRepository.checkUserInRoom(roomId, userId)) return Result.UserAlreadyInRoom
         if (room.gameStarted) return Result.GameAlreadyStarted
 
-        return if (matchRepository.addToRoom(room.id, userId, wishlist)) {
+        return if (matchRepository.addToRoom(room.id, userId)) {
             Result.Successful
         } else {
             Result.Failed

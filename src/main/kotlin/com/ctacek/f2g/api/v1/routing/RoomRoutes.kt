@@ -1,5 +1,14 @@
 package com.ctacek.f2g.api.v1.routing
 
+import com.ctacek.f2g.api.v1.requests.rooms.CreateRoomRequest
+import com.ctacek.f2g.api.v1.requests.rooms.UpdateRoomRequest
+import com.ctacek.f2g.domain.entities.RoomDTO.RoomUpdate
+import com.ctacek.f2g.domain.useCases.UseCases
+import com.ctacek.f2g.domain.useCases.game.JoinRoomUseCase
+import com.ctacek.f2g.domain.useCases.rooms.CreateRoomUseCase
+import com.ctacek.f2g.domain.useCases.rooms.DeleteRoomUseCase
+import com.ctacek.f2g.domain.useCases.rooms.GetRoomDetailsUseCase
+import com.ctacek.f2g.domain.useCases.rooms.UpdateRoomUseCase
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -7,18 +16,8 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.ctacek.f2g.api.v1.requests.rooms.CreateRoomRequest
-import com.ctacek.f2g.api.v1.requests.rooms.UpdateRoomRequest
-import com.ctacek.f2g.domain.entities.RoomDTO.RoomUpdate
-import com.ctacek.f2g.domain.useCases.UseCases
-import com.ctacek.f2g.domain.useCases.game.AcceptUserUseCase
-import com.ctacek.f2g.domain.useCases.game.JoinRoomUseCase
-import com.ctacek.f2g.domain.useCases.rooms.CreateRoomUseCase
-import com.ctacek.f2g.domain.useCases.rooms.DeleteRoomUseCase
-import com.ctacek.f2g.domain.useCases.rooms.GetRoomDetailsUseCase
-import com.ctacek.f2g.domain.useCases.rooms.UpdateRoomUseCase
 
-fun Route.configureRoomsRoutes(
+fun Route.configureRoomRoutes(
     useCases: UseCases,
 ) {
     route("/room") {
@@ -69,10 +68,8 @@ fun Route.configureRoomsRoutes(
                 }
                 val res = useCases.createRoomUseCase(
                     userId = userId,
-                    roomName = request.name,
+                    roomName = request.username,
                     date = request.date,
-                    maxPrice = request.maxPrice,
-                    playableOwner = request.playableOwner,
                 )
                 when (res) {
                     CreateRoomUseCase.Result.Failed -> {
@@ -84,14 +81,8 @@ fun Route.configureRoomsRoutes(
                         val joinRequest = useCases.joinRoomUseCase(
                             userId = userId,
                             roomId = res.room.id,
-                            wishlist = request.wishList,
                         )
-                        val acceptRequest = useCases.acceptUserUseCase(
-                            selfId = userId,
-                            userId = userId,
-                            roomId = res.room.id,
-                        )
-                        if (joinRequest is JoinRoomUseCase.Result.Successful && acceptRequest is AcceptUserUseCase.Result.Successful) {
+                        if (joinRequest is JoinRoomUseCase.Result.Successful) {
                             call.respond(HttpStatusCode.OK, res.room)
                         } else {
                             call.respond(HttpStatusCode.InternalServerError, "Something went wrong")
@@ -165,7 +156,6 @@ fun Route.configureRoomsRoutes(
                     RoomUpdate(
                         name = it.name,
                         date = it.date,
-                        maxPrice = it.maxPrice,
                     )
                 } ?: run {
                     call.respond(HttpStatusCode.BadRequest)

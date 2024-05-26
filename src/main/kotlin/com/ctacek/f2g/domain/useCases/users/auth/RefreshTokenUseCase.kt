@@ -1,12 +1,12 @@
 package com.ctacek.f2g.domain.useCases.users.auth
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.security.jwt.token.TokenClaim
 import com.ctacek.f2g.security.jwt.token.TokenConfig
 import com.ctacek.f2g.security.jwt.token.TokenPair
 import com.ctacek.f2g.security.jwt.token.TokenService
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class RefreshTokenUseCase : KoinComponent {
     private val usersRepository: UsersRepository by inject()

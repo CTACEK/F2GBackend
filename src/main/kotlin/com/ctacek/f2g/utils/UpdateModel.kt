@@ -1,9 +1,9 @@
 package com.ctacek.f2g.utils
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import com.ctacek.f2g.domain.entities.RoomDTO
 import com.ctacek.f2g.domain.entities.UserDTO
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class UpdateModel {

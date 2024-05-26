@@ -1,15 +1,14 @@
 package com.ctacek.f2g.domain.useCases.users.auth
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.ctacek.f2g.domain.entities.UserDTO
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.security.jwt.hashing.HashingService
 import com.ctacek.f2g.security.jwt.token.*
 import com.ctacek.f2g.utils.getRandomUserID
-import com.ctacek.f2g.utils.getRandomUsername
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class SignUpViaEmailUseCase : KoinComponent {
+class SignUpViaUsernameUseCase : KoinComponent {
 
     private val usersRepository: UsersRepository by inject()
     private val tokenService: TokenService by inject()
@@ -23,8 +22,8 @@ class SignUpViaEmailUseCase : KoinComponent {
         object AvatarNotFound : Result
     }
 
-    suspend operator fun invoke(user: UserDTO.UserEmailSignUp): Result {
-        if (usersRepository.getUserByEmail(user.email) != null) return Result.UserAlreadyExists
+    suspend operator fun invoke(user: UserDTO.UserSignUp): Result {
+        if (usersRepository.getUserByUsername(user.username) != null) return Result.UserAlreadyExists
         val userId = getRandomUserID()
         val tokenPair = tokenService.generateTokenPair(tokenConfig, TokenClaim("userId", userId))
 
@@ -32,11 +31,9 @@ class SignUpViaEmailUseCase : KoinComponent {
 
         val resUser = UserDTO.User(
             userId = userId,
-            username = user.username.ifEmpty { "Guest-${getRandomUsername()}" },
-            email = user.email,
+            username = user.username,
             passwordHash = hashingService.generateHash(user.password),
             authProvider = "local",
-            address = user.address,
             avatar = avatar,
         )
         val registerUserResult = usersRepository.registerUser(resUser)

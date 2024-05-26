@@ -6,5 +6,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class JoinRoomRequest(
     @SerialName("room_id") val roomId: String,
-    val wishlist: String?,
 )

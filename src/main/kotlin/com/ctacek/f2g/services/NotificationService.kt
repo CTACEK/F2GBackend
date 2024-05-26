@@ -1,8 +1,5 @@
 package com.ctacek.f2g.services
 
-import kotlinx.coroutines.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.ctacek.f2g.domain.entities.Notification
 import com.ctacek.f2g.domain.entities.NotificationMessage
 import com.ctacek.f2g.domain.repositories.MatchRepository
@@ -10,6 +7,9 @@ import com.ctacek.f2g.domain.repositories.RoomsRepository
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.domain.services.OneSignalService
 import com.ctacek.f2g.utils.UpdateModel
+import kotlinx.coroutines.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class NotificationService : KoinComponent {
     private val usersRepository: UsersRepository by inject()

@@ -1,12 +1,12 @@
 package com.ctacek.f2g.domain.useCases.users.auth
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.ctacek.f2g.domain.repositories.UsersRepository
 import com.ctacek.f2g.security.jwt.hashing.HashingService
 import com.ctacek.f2g.security.jwt.token.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class LoginViaEmailUseCase : KoinComponent {
+class LoginViaUsernameUseCase : KoinComponent {
     private val usersRepository: UsersRepository by inject()
     private val hashingService: HashingService by inject()
     private val tokenService: TokenService by inject()
@@ -18,8 +18,8 @@ class LoginViaEmailUseCase : KoinComponent {
         object Failed : Result
     }
 
-    suspend operator fun invoke(email: String, password: String, clientId: String): Result {
-        val user = usersRepository.getUserByEmail(email) ?: return Result.Forbidden
+    suspend operator fun invoke(username: String, password: String, clientId: String): Result {
+        val user = usersRepository.getUserByUsername(username) ?: return Result.Forbidden
         val passwordVerificationResult = hashingService.verify(password, user.passwordHash ?: return Result.Forbidden)
         if (!passwordVerificationResult.verified) return Result.Forbidden
         val tokenPair = tokenService.generateTokenPair(tokenConfig, TokenClaim("userId", user.userId))

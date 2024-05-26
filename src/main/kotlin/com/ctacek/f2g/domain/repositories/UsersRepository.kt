@@ -9,7 +9,7 @@ interface UsersRepository {
     suspend fun deleteUserByID(userId: String): Boolean
     suspend fun getUserByID(userId: String): UserDTO.UserInfo?
     suspend fun updateUserByID(userId: String, update: UserDTO.UpdateUser): Boolean
-    suspend fun getUserByEmail(email: String): UserDTO.User?
+    suspend fun getUserByUsername(username: String): UserDTO.User?
 
     suspend fun updateUserRefreshToken(
         userId: String,
