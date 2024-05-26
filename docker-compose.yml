@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 services:
   server:
     build: .
@@ -22,6 +22,7 @@ services:
     depends_on:
       - db
     networks:
+      - reverse-proxy
       - db_network
     restart: always
 
@@ -41,5 +42,8 @@ services:
     restart: always
 
 networks:
+  reverse-proxy:
+    external:
+      name: reverse-proxy
   db_network:
     driver: bridge
