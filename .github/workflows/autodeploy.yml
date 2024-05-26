@@ -1,0 +1,62 @@
+name: Docker deploy
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login (Yandex Cloud)
+        id: login-cr
+        uses: yc-actions/yc-cr-login@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.AUTHORIZED_KEY }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Build image (Yandex Cloud)
+        env:
+          CR_REGISTRY: crpr9q2g3bdv573r6nng
+          CR_REPOSITORY: backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+        
+
+      - name: Connect to VM via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: 158.160.91.75
+          username: ctaceks
+          key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          port: 22
+
+      - name: Run commands on VM
+        env:
+           YANDEX_KEY: ${{ secrets.YANDEX_KEY }}
+           IMAGE_TAG: ${{ github.sha }}
+        run: |
+          sudo docker login --username oauth --password $YANDEX_KEY cr.yandex
+          if [ "$(docker ps -q)" ]; then
+            sudo docker kill $(docker ps -q) &> /dev/null
+          fi
+          if [ "$(docker ps -a -q)" ]; then
+            sudo docker rm $(docker ps -a -q) &> /dev/null
+          fi
+          sudo docker-compose pull
+          sudo docker-compose up -d --force-recreate

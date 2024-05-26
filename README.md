@@ -78,3 +78,5 @@ ROOM_ID - идентификатор комнаты
   ```
     ws://BASE_URL/api/v1/match/all
   ```
+
+[![Docker deploy](https://github.com/CTACEK/F2GBackend/actions/workflows/autodeploy.yml/badge.svg?branch=dev&event=push)](https://github.com/CTACEK/F2GBackend/actions/workflows/autodeploy.yml)
