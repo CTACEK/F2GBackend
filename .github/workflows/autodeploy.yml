@@ -20,11 +20,11 @@ jobs:
 
       - name: Build image (Yandex Cloud)
         env:
-          CR_REGISTRY: crp7qfv6r081t2ofp03o
+          CR_REGISTRY: crpr9q2g3bdv573r6nng
           CR_REPOSITORY: backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:user$IMAGE_TAG ./
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:user$IMAGE_TAG
           docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:user$IMAGE_TAG
         
 
